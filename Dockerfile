@@ -20,12 +20,9 @@ COPY .env.example ./.env.example
 # Install Python dependencies
 RUN pip install --no-cache-dir -e ".[dev]"
 
-# Ingest docs into vector store on build
-# (skipped if DATABASE_URL points to external DB — run manually)
+# Pre-download the embedding model to avoid startup timeout
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD python -c "import httpx; r = httpx.get('http://localhost:8000/healthz'); r.raise_for_status()"
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

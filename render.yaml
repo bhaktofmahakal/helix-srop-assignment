@@ -5,6 +5,8 @@ services:
     plan: free
     healthCheckPath: /healthz
     envVars:
+      - key: PORT
+        value: 10000
       - key: DATABASE_URL
         sync: false
       - key: GROQ_API_KEY
