@@ -5,7 +5,6 @@ Routes user queries to specialized sub-agents using LLM function calling.
 
 import asyncio
 import json
-import logging
 import uuid
 from time import monotonic
 from typing import Any
@@ -356,6 +355,7 @@ async def _dispatch_agent(
         result = await _execute_escalation_agent(
             args.get("summary", user_message),
             args.get("priority", "medium"),
+            state.user_id
         )
         return (
             "escalation",
@@ -440,12 +440,11 @@ async def _execute_account_agent(user_id: str, limit: int) -> str:
     )
 
 
-async def _execute_escalation_agent(summary: str, priority: str) -> str:
+async def _execute_escalation_agent(summary: str, priority: str, user_id: str) -> str:
     """Execute escalation agent: create a ticket and return its ID."""
     from app.agents.tools.ticket_tools import create_ticket
 
-    # Use a placeholder user_id — the real one is in state, passed via args
-    result = await create_ticket(user_id="system", summary=summary, priority=priority)
+    result = await create_ticket(user_id=user_id, summary=summary, priority=priority)
     return f"Created ticket {result.ticket_id} (priority: {result.priority}, status: {result.status}). Summary: {summary[:80]}"
 
 
