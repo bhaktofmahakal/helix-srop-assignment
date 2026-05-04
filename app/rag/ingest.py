@@ -65,14 +65,6 @@ def _chunk_sentences(text: str, max_chars: int, overlap_chars: int) -> list[str]
 def chunk_markdown(text: str, chunk_size: int = 800, overlap: int = 120) -> list[str]:
     """
     Split markdown text into overlapping chunks.
-
-    Design considerations:
-    - Simple character splitting is fast but breaks mid-sentence.
-    - Sentence-aware splitting is better for retrieval quality.
-    - Heading-aware splitting (split on ## / ###) keeps sections coherent.
-    - Overlap helps preserve context at chunk boundaries.
-
-    Choose an approach and document why in the README.
     """
     _, body = _extract_frontmatter(text)
     sections = re.split(r"\n(?=#{2,3} )", body.strip())
@@ -91,14 +83,6 @@ def chunk_markdown(text: str, chunk_size: int = 800, overlap: int = 120) -> list
 def extract_metadata(file_path: Path, text: str) -> dict:
     """
     Extract metadata from a markdown file's frontmatter.
-
-    Expected frontmatter format:
-        ---
-        title: Deploy Keys
-        product_area: security
-        tags: [keys, secrets]
-        ---
-
     Returns a dict suitable for vector store metadata filtering.
     """
     metadata, _ = _extract_frontmatter(text)
@@ -115,11 +99,6 @@ def extract_metadata(file_path: Path, text: str) -> dict:
 async def ingest_directory(docs_path: Path, chunk_size: int, chunk_overlap: int) -> None:
     """
     Walk docs_path, chunk and embed every .md file, upsert into vector store.
-
-    Design considerations:
-    - Generate a stable chunk_id (e.g. sha256(file + chunk_index)) for deduplication.
-    - Run embeddings in batches to avoid rate limiting.
-    - Print progress so the user can see what's happening.
     """
     md_files = sorted(docs_path.rglob("*.md"))
     print(f"Found {len(md_files)} markdown files in {docs_path}")
