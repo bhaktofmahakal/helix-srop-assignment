@@ -85,7 +85,7 @@ Vector DB   Mock DB   Tickets DB
 | `GET` | `/v1/traces/{trace_id}` | Get structured trace for debugging |
 | `GET` | `/healthz` | Health check |
 
-## Quick Test
+## Quick Test (Local)
 
 ```bash
 SESSION=$(curl -s -X POST localhost:8000/v1/sessions \
@@ -96,6 +96,8 @@ curl -s -X POST localhost:8000/v1/chat/$SESSION \
   -H "Content-Type: application/json" \
   -d '{"message": "How do I rotate a deploy key?"}' | jq .
 ```
+
+For live API testing, see the [Live Demo & Testing](#live-demo--testing) section.
 
 ## Extensions Implemented
 
@@ -136,6 +138,31 @@ curl -s -X POST localhost:8000/v1/chat/$SESSION \
 4. No rate limiting per plan tier
 5. Session state JSON is not normalized (trades schema for simplicity)
 6. Groq function calling occasionally returns text instead of tool call — handled gracefully as "smalltalk"
+
+## Live Demo & Testing
+
+The project is live at: [https://helix-srop-assignment.onrender.com](https://helix-srop-assignment.onrender.com)
+
+### Testing the Live API
+
+You can test the live deployment using `curl`. Note: The first request might take 30s due to Render's free tier cold start.
+
+**1. Create a session:**
+```bash
+SESSION=$(curl -s -X POST https://helix-srop-assignment.onrender.com/v1/sessions \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "evaluator_live", "plan_tier": "pro"}' | jq -r .session_id)
+echo "Session created: $SESSION"
+```
+
+**2. Ask a question:**
+```bash
+curl -s -X POST https://helix-srop-assignment.onrender.com/v1/chat/$SESSION \
+  -H "Content-Type: application/json" \
+  -d '{"message": "How do I rotate a deploy key?"}' | jq .
+```
+
+---
 
 ## Deployment (Render)
 
