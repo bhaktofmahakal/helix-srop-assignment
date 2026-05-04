@@ -13,5 +13,7 @@ services:
         sync: false
       - key: LLM_PROVIDER
         value: auto
+      - key: HF_TOKEN
+        sync: false
       - key: GOOGLE_API_KEY
         sync: false
